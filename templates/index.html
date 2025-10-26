@@ -1,11 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Welcome to Coffee Quiz</title>
+    <meta charset="UTF-8">
+    <title>Coffee Chemistry</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align:center; padding:50px; }
+        input { padding:10px; width:200px; }
+        button { padding:10px 20px; margin:5px; }
+    </style>
 </head>
 <body>
-    <h1>Welcome to Your Coffee Quiz!</h1>
-    <p>Discover your perfect café together.</p>
-    <a href="/pair"><button>Start Quiz</button></a>
+    <h1>Coffee Chemistry</h1>
+    <form action="{{ url_for('pair') }}" method="post">
+        <input type="text" name="pair_code" placeholder="Add code to join">
+        <button type="submit">Join</button>
+    </form>
+    <form action="{{ url_for('pair') }}" method="post">
+        <button type="submit">Create Code</button>
+    </form>
 </body>
 </html>

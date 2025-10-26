@@ -1,62 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Coffee Quiz Questions</title>
+    <meta charset="UTF-8">
+    <title>Question {{ qnum }} of {{ total }}</title>
     <style>
-        .step { display: none; }
-        .step.active { display: block; }
+        body { font-family: Arial, sans-serif; padding:50px; }
+        textarea { width:80%; height:100px; padding:10px; resize:vertical; }
+        button { padding:10px 20px; margin:10px; }
     </style>
 </head>
 <body>
-    <h1>Coffee Quiz</h1>
-    <form id="quizForm" method="post">
-        <!-- Question 1 -->
-        <div class="step active">
-            <label>What's your favorite coffee vibe or style?</label><br>
-            <input type="text" name="q1"><br><br>
-            <button type="button" onclick="nextStep()">Next</button>
-        </div>
-
-        <!-- Question 2 -->
-        <div class="step">
-            <label>Describe your ideal café experience in a few words.</label><br>
-            <input type="text" name="q2"><br><br>
-            <button type="button" onclick="prevStep()">Back</button>
-            <button type="button" onclick="nextStep()">Next</button>
-        </div>
-
-        <!-- Question 3 -->
-        <div class="step">
-            <label>Any special preferences or must-haves?</label><br>
-            <input type="text" name="q3"><br><br>
-            <button type="button" onclick="prevStep()">Back</button>
-            <input type="submit" value="Submit">
-        </div>
+    <h2>Question {{ qnum }} of {{ total }}</h2>
+    <p>{{ question }}</p>
+    <form method="post">
+        <textarea name="answer" required></textarea><br>
+        {% if qnum > 1 %}
+            <a href="{{ url_for('questions', pair_code=pair_code, qnum=qnum-1) }}">
+                <button type="button">Back</button>
+            </a>
+        {% endif %}
+        <button type="submit">{% if qnum == total %}Submit{% else %}Next{% endif %}</button>
     </form>
-
-    <script>
-        let currentStep = 0;
-        const steps = document.querySelectorAll(".step");
-
-        function showStep(index) {
-            steps.forEach((step, i) => {
-                step.classList.toggle("active", i === index);
-            });
-        }
-
-        function nextStep() {
-            if (currentStep < steps.length - 1) {
-                currentStep++;
-                showStep(currentStep);
-            }
-        }
-
-        function prevStep() {
-            if (currentStep > 0) {
-                currentStep--;
-                showStep(currentStep);
-            }
-        }
-    </script>
 </body>
 </html>
+
+

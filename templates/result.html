@@ -1,13 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Your Perfect Café</title>
+    <meta charset="UTF-8">
+    <title>Your Coffee Match</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding:50px; }
+        .cafe { margin-bottom:30px; }
+        h2 { margin-bottom:5px; }
+    </style>
 </head>
 <body>
-    <h1>Your Coffee Chemistry ☕</h1>
-    <h2>{{ cafe.name }}</h2>
-    <p>{{ cafe.description }}</p>
-    <p>{{ comment }}</p>
-    <a href="/"><button>Start Over</button></a>
+    <h1>Your Coffee Match</h1>
+    <div class="cafe">
+        <h2>Main Café: {{ main.name }}</h2>
+        <p>{{ main.desc }}</p>
+    </div>
+    <div class="cafe">
+        <h3>Backup Options:</h3>
+        <ul>
+            {% for b in backups %}
+            <li>{{ b.name }} - {{ b.desc }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>

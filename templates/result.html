@@ -1,16 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Your Coffee Match</title>
-  <style>
-    body { text-align:center; background:#fff4e6; font-family:Arial; padding:50px; }
-    h1 { color:#6f4e37; }
-  </style>
+    <title>Your Coffee Match</title>
+    <style>
+        body {
+            background-color: #f4ede3;
+            font-family: 'Segoe UI', sans-serif;
+            color: #3e2723;
+            text-align: center;
+            padding: 3em;
+        }
+        .cafe {
+            border: 2px solid #a1887f;
+            border-radius: 10px;
+            padding: 1em;
+            margin: 1em auto;
+            max-width: 400px;
+            background-color: #fff;
+        }
+    </style>
 </head>
 <body>
-  <h1>Your Coffee Match: {{ main_coffee }}</h1>
-  <p>Backup choices: {{ backups[0] }}, {{ backups[1] }}</p>
-  <p>Compatibility score: {{ score }}</p>
-  <h3>☕ Brew together and enjoy your shared flavor journey ☕</h3>
+    <h2>☕ Your Coffee Chemistry Result</h2>
+    <div class="cafe">
+        <h3>{{ cafe.name }}</h3>
+        <p>{{ cafe.desc }}</p>
+    </div>
+
+    <h4>Backup Cafés</h4>
+    {% for c in backups %}
+        <div class="cafe">
+            <h3>{{ c.name }}</h3>
+            <p>{{ c.desc }}</p>
+        </div>
+    {% endfor %}
 </body>
 </html>

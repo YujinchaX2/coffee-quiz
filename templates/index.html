@@ -1,28 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Coffee Chemistry</title>
-  <style>
-    body { text-align:center; font-family:Arial; background:#f3e9dc; padding:50px; }
-    input, button { padding:10px; margin:5px; font-size:16px; border-radius:6px; border:none; }
-    button { background:#6f4e37; color:white; cursor:pointer; }
-    button:hover { background:#563625; }
-    .error { color:red; font-weight:bold; }
-  </style>
+    <title>Coffee Chemistry</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4ede3;
+            color: #3e2723;
+            text-align: center;
+            margin: 0;
+            padding: 2em;
+        }
+        h1 { color: #4e342e; }
+        input[type="text"] {
+            padding: 0.6em;
+            border: 1px solid #a1887f;
+            border-radius: 5px;
+            width: 200px;
+        }
+        button {
+            background-color: #6d4c41;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.6em 1.2em;
+            cursor: pointer;
+            margin: 0.3em;
+        }
+        button:hover { background-color: #5d4037; }
+        .error { color: red; margin-top: 10px; }
+        .box { margin-top: 20px; }
+    </style>
 </head>
 <body>
-  <h1>☕ Coffee Chemistry ☕</h1>
-  <form action="/join_pair" method="post">
-    <input type="text" name="pair_code" placeholder="Add code to join">
-    <button type="submit">Join</button>
-  </form>
+    <h1>☕ Coffee Chemistry</h1>
 
-  <form action="/create_pair" method="post">
-    <button type="submit">Create code</button>
-  </form>
+    <form method="POST">
+        <input type="text" name="pair_code" placeholder="add code to join">
+        <button type="submit" name="join">Join</button>
+        <div class="box">
+            <button type="submit" name="create">Create code</button>
+        </div>
+    </form>
 
-  {% if error %}
-  <p class="error">{{ error }}</p>
-  {% endif %}
+    {% if pair_created %}
+    <div>
+        <h3>Your code: {{ pair_created }}</h3>
+        <form method="POST" action="{{ url_for('start_quiz') }}">
+            <button type="submit" name="quiz_type" value="light">Light roast start ☕</button>
+            <button type="submit" name="quiz_type" value="dark">Dark roast start ☕</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
 </body>
 </html>

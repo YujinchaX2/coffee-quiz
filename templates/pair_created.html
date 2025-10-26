@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Coffee Chemistry</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align:center; padding:50px; }
-        button { padding:10px 20px; margin:5px; }
-    </style>
+  <title>Pair Created</title>
+  <style>
+    body { text-align:center; font-family:Arial; background:#fff4e6; padding:50px; }
+    button { padding:10px 20px; background:#6f4e37; color:white; border:none; border-radius:6px; cursor:pointer; margin:10px; }
+    button:hover { background:#4b3826; }
+  </style>
 </head>
 <body>
-    <h1>Pair Code: {{ pair_code }}</h1>
-    <p>Choose your quiz:</p>
-    <a href="{{ url_for('start_quiz', pair_code=pair_code, quiz_type='light') }}">
-        <button>Light Roast Start (12 Qs)</button>
-    </a>
-    <a href="{{ url_for('start_quiz', pair_code=pair_code, quiz_type='dark') }}">
-        <button>Dark Roast Start (30 Qs)</button>
-    </a>
+  {% if not joined %}
+    <h2>Your pair code:</h2>
+    <h1>{{ pair_code }}</h1>
+    <p>Share this code with your partner so they can join.</p>
+  {% else %}
+    <h2>Pair Joined!</h2>
+    <p>Start your flavor adventure together:</p>
+  {% endif %}
+  
+  <a href="{{ url_for('start_quiz', version='short') }}"><button>☕ Light roast start (12 questions)</button></a>
+  <a href="{{ url_for('start_quiz', version='long') }}"><button>🌑 Dark roast start (30 questions)</button></a>
 </body>
 </html>

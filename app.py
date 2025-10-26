@@ -1,149 +1,121 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import random
-import string
 
 app = Flask(__name__)
+app.secret_key = "coffee_secret_key"
 
-# ---- Questions ----
-LIGHT_ROAST_QUESTIONS = [
-    # 12 questions
-    "If you could wake up in any country tomorrow, where would it be — and what’s the first thing you’d do?",
-    "Describe your perfect Sunday — how would you spend it?",
-    "If you could have any animal as a pet (real or fantasy), what would you choose?",
-    "What’s a weird or unexpected food combo you secretly enjoy?",
-    "What song instantly puts you in a good mood?",
-    "What superpower would you love to have for just one day?",
-    "You have the whole day free — do you plan something or just see where it takes you?",
-    "What’s something small that never fails to make you smile?",
-    "If someone challenged you to a spontaneous adventure, how would you respond?",
-    "You’re traveling somewhere new — what’s the first thing you look for when you arrive?",
-    "What’s your go-to drink when you want to treat yourself?",
-    "If you could teleport anywhere right now for one hour, where would you go?",
-]
-
-DARK_ROAST_QUESTIONS = [
-    # 30 questions (full list you gave)
-    "If you could wake up in any country tomorrow, where would it be — and what’s the first thing you’d do?",
-    "Describe your perfect Sunday — how would you spend it?",
-    "If you could have any animal as a pet (real or fantasy), what would you choose?",
-    "What’s a weird or unexpected food combo you secretly enjoy?",
-    "What song instantly puts you in a good mood?",
-    "What superpower would you love to have for just one day?",
-    "You have the whole day free — do you plan something or just see where it takes you?",
-    "What’s something small that never fails to make you smile?",
-    "If someone challenged you to a spontaneous adventure, how would you respond?",
-    "You’re traveling somewhere new — what’s the first thing you look for when you arrive?",
-    "What’s your go-to drink when you want to treat yourself?",
-    "If you could teleport anywhere right now for one hour, where would you go?",
-    "When you need to clear your head, what’s your favorite kind of place to be?",
-    "If you could live in any time period or era, which would you pick — and why?",
-    "What’s something creative you’ve always wanted to try (or already do)?",
-    "What’s one thing that instantly makes a place feel cozy to you?",
-    "Would you rather spend an evening with good music and conversation, or explore somewhere new and lively?",
-    "If we could share one meal together — no rules, no limits — what would it be?",
-    "What’s one thing people might be surprised to learn about you?",
-    "When you picture your ideal morning, what’s in it?",
-    "If you could design your own café, what would it be like?",
-    "What’s your favorite way to connect with someone — deep talks, laughter, shared silence, or something else?",
-    "What’s a simple moment that always feels special to you?",
-    "If your life had a theme song that played when you walked into a room, what would it be?",
-    "After a long day, what helps you relax?",
-    "What small object brings you comfort?",
-    "Describe your dream workspace or creative corner.",
-    "Which season makes you happiest, and why?",
-    "If you could spend a day learning something new, what would it be?",
-    "Describe a memory that always makes you smile."
-]
-
-# ---- Cafés ----
-CAFES = [
-    {"name": "ViCAFE Hohlstrasse 418", "desc": "A space alive and welcoming at any time, where the smell of fresh coffee energizes the senses.", "category": ["Playful / Lively"]},
-    {"name": "La Lere", "desc": "Sunlight fills a clean, minimalist space with carefully arranged details.", "category": ["Minimalist / Calm", "Creative / Artsy"]},
-    {"name": "MAME Coffee", "desc": "High ceilings and open spaces bring a sense of calm and modern style.", "category": ["Minimalist / Calm"]},
-    {"name": "Robin’s Coffee", "desc": "Soft lighting, comfortable chairs, and a gentle buzz in the background make this café instantly relaxing.", "category": ["Cozy / Warm", "Minimalist / Calm"]},
-    {"name": "Kafi Freud", "desc": "Colorful details, comfortable corners, and the smell of fresh pastries create a cheerful, easygoing vibe.", "category": ["Cozy / Warm", "Playful / Lively"]},
-    {"name": "Irma Zürich", "desc": "Polished design and a calm atmosphere give this café a modern edge.", "category": ["Chic / Stylish"]},
-    {"name": "Roxy Café", "desc": "Vintage vibes and quirky details transport you back in time.", "category": ["Creative / Artsy", "Playful / Lively"]},
-    {"name": "Babus", "desc": "Modern, bright, and welcoming, with a comfortable atmosphere.", "category": ["Cozy / Warm"]},
-    {"name": "Café Europa", "desc": "Bright, colorful, and full of energy.", "category": ["Playful / Lively", "Cozy / Warm"]},
-    {"name": "Belmondo", "desc": "Elegant interiors, lush greenery, and subtle tropical touches create a stylish, inviting space.", "category": ["Chic / Stylish"]},
-    {"name": "OKO Bar", "desc": "Warm wood tones, soft lighting, and natural materials create a calming, eco-friendly space.", "category": ["Eco-conscious / Natural", "Cozy / Warm"]},
-    {"name": "Cà Phê Lơ Mơ", "desc": "Bold colors and playful décor create an energetic, inspiring space.", "category": ["Creative / Artsy", "Playful / Lively"]},
-    {"name": "Café Noir", "desc": "Warm, intimate, and open, perfect for catching up over coffee.", "category": ["Chic / Stylish", "Cozy / Warm"]},
-    {"name": "Draft Coffee", "desc": "Industrial-chic interiors and exposed elements create a clean, modern space.", "category": ["Minimalist / Calm", "Chic / Stylish"]},
-    {"name": "Amiamo Caffè", "desc": "Rustic charm, warm colors, and the aroma of Italian espresso fill this small, inviting space.", "category": ["Cozy / Warm", "Chic / Stylish"]},
-    {"name": "Miro Coffee", "desc": "Bright, modern, and welcoming, with greenery adding a relaxed touch.", "category": ["Minimalist / Calm"]},
-    {"name": "NUDE Zürich", "desc": "Soft lighting, calm spaces, and clean design create a serene retreat.", "category": ["Minimalist / Calm"]},
-    {"name": "Slurp Zürich", "desc": "Clean, bright, and welcoming, with a warm, friendly atmosphere.", "category": ["Playful / Lively", "Cozy / Warm"]},
-    {"name": "Alea Spielbar", "desc": "Bright, social, and buzzing with energy.", "category": ["Interactive / Social", "Playful / Lively"]},
-]
-
-# ---- Pair storage ----
+# In-memory storage for simplicity
 pairs = {}
+questions_short = [
+    "What is your go-to morning beverage?",
+    "How do you feel about strong flavors?",
+    "Do you enjoy a bit of bitterness?",
+    "Do you prefer fruity or nutty aromas?",
+    "How do you take your coffee?",
+    "When do you usually drink coffee?",
+    "What do you pair coffee with?",
+    "How adventurous are you with new flavors?",
+    "Do you enjoy coffee with milk or black?",
+    "How important is caffeine to you?",
+    "What’s your ideal coffee experience?",
+    "Do you prefer warm or cold coffee?"
+]
 
-# ---- Routes ----
+questions_long = questions_short + [
+    "What texture do you like in a drink?",
+    "How often do you drink coffee?",
+    "Do you enjoy sweet drinks?",
+    "Do you prefer a classic or modern taste?",
+    "Would you describe yourself as patient?",
+    "Do you enjoy slow mornings?",
+    "What mood do you want your coffee to match?",
+    "Do you drink coffee socially or alone?",
+    "What’s your favorite dessert flavor?",
+    "Do you like surprises?",
+    "How do you handle bitterness?",
+    "How do you brew coffee at home?",
+    "Do you like strong aroma?",
+    "Do you drink coffee daily?",
+    "What’s your favorite café vibe?",
+    "Do you enjoy experimenting with coffee flavors?",
+    "Do you prefer hot or iced drinks?",
+    "How much sugar do you use in coffee?",
+    "Describe your ideal coffee break in one word."
+]
+
+coffees = [
+    "Espresso", "Latte", "Cappuccino", "Americano",
+    "Flat White", "Macchiato", "Cold Brew", "Mocha",
+    "Ristretto", "Affogato"
+]
+
 @app.route("/")
 def index():
     return render_template("index.html")
 
-@app.route("/pair", methods=["POST"])
-def pair():
-    pair_code = request.form.get("pair_code") or "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
-    if pair_code not in pairs:
-        pairs[pair_code] = {"answers": {}, "ready": set(), "quiz_length": None}
-    return redirect(url_for("pair_created", pair_code=pair_code))
 
-@app.route("/pair_created/<pair_code>")
-def pair_created(pair_code):
+@app.route("/create_pair", methods=["POST"])
+def create_pair():
+    pair_code = str(random.randint(1000, 9999))
+    pairs[pair_code] = {"users": [], "answers": {}}
     return render_template("pair_created.html", pair_code=pair_code)
 
-@app.route("/start_quiz/<pair_code>/<quiz_type>")
-def start_quiz(pair_code, quiz_type):
-    if quiz_type == "light":
-        questions = LIGHT_ROAST_QUESTIONS
-    else:
-        questions = DARK_ROAST_QUESTIONS
-    pairs[pair_code]["quiz_length"] = len(questions)
-    return redirect(url_for("questions", pair_code=pair_code, qnum=1))
 
-@app.route("/questions/<pair_code>/<int:qnum>", methods=["GET", "POST"])
-def questions(pair_code, qnum):
-    quiz_length = pairs[pair_code]["quiz_length"]
-    if request.method == "POST":
-        answer = request.form.get("answer")
-        pairs[pair_code]["answers"][qnum] = answer
-        return redirect(url_for("questions", pair_code=pair_code, qnum=qnum+1))
-    if qnum > quiz_length:
-        return redirect(url_for("submitted_wait", pair_code=pair_code))
-    questions_list = LIGHT_ROAST_QUESTIONS if quiz_length == 12 else DARK_ROAST_QUESTIONS
-    return render_template("questions.html", question=questions_list[qnum-1], qnum=qnum, total=quiz_length, pair_code=pair_code)
+@app.route("/join_pair", methods=["POST"])
+def join_pair():
+    code = request.form.get("pair_code", "").strip()
+    if not code:
+        return render_template("index.html", error="Please enter a code to join.")
+    if code not in pairs:
+        return render_template("index.html", error="Invalid code. Please try again.")
+    if len(pairs[code]["users"]) >= 2:
+        return render_template("index.html", error="This pair is already full.")
+    session["pair_code"] = code
+    pairs[code]["users"].append(f"user{len(pairs[code]['users']) + 1}")
+    return redirect(url_for("choose_quiz"))
 
-@app.route("/submitted_wait/<pair_code>")
-def submitted_wait(pair_code):
-    # Check if both users finished
-    if len(pairs[pair_code]["ready"]) < 2:
-        return render_template("submitted_wait.html", pair_code=pair_code)
-    else:
-        return redirect(url_for("result", pair_code=pair_code))
 
-@app.route("/finish/<pair_code>")
-def finish(pair_code):
-    # User signals they are done
-    user = request.args.get("user")
-    pairs[pair_code]["ready"].add(user)
-    if len(pairs[pair_code]["ready"]) < 2:
-        return redirect(url_for("submitted_wait", pair_code=pair_code))
-    else:
-        return redirect(url_for("result", pair_code=pair_code))
+@app.route("/choose_quiz")
+def choose_quiz():
+    return render_template("pair_created.html", pair_code=session["pair_code"], joined=True)
 
-@app.route("/result/<pair_code>")
-def result(pair_code):
-    # Basic matching logic for demo
-    cafe = random.choice(CAFES)
-    backups = random.sample([c for c in CAFES if c != cafe], 2)
-    return render_template("result.html", main=cafe, backups=backups)
+
+@app.route("/start_quiz/<version>")
+def start_quiz(version):
+    code = session.get("pair_code")
+    if not code:
+        return redirect(url_for("index"))
+    questions = questions_short if version == "short" else questions_long
+    session["questions"] = questions
+    session["version"] = version
+    return render_template("questions.html", questions=questions, total=len(questions), pair_code=code)
+
+
+@app.route("/submit", methods=["POST"])
+def submit():
+    code = session.get("pair_code")
+    if not code or code not in pairs:
+        return redirect(url_for("index"))
+
+    answers = [request.form.get(f"answer_{i}") for i in range(len(session["questions"]))]
+    user = f"user{len(pairs[code]['answers']) + 1}"
+    pairs[code]["answers"][user] = answers
+
+    # Wait for the other user
+    if len(pairs[code]["answers"]) < 2:
+        return render_template("submitted_wait.html")
+
+    # Analyze compatibility
+    user1_answers = pairs[code]["answers"]["user1"]
+    user2_answers = pairs[code]["answers"]["user2"]
+
+    compatibility = sum(1 for a, b in zip(user1_answers, user2_answers) if a == b)
+    main_coffee = random.choice(coffees)
+    backups = random.sample([c for c in coffees if c != main_coffee], 2)
+
+    return render_template("result.html", main_coffee=main_coffee, backups=backups, score=compatibility)
+
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
-
+    app.run(debug=True)
 

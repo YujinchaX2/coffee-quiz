@@ -1,27 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Question {{ qnum }} of {{ total }}</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding:50px; }
-        textarea { width:80%; height:100px; padding:10px; resize:vertical; }
-        button { padding:10px 20px; margin:10px; }
-    </style>
+  <title>Coffee Chemistry Quiz</title>
+  <style>
+    body { text-align:center; background:#f8efe2; font-family:Arial; padding:40px; }
+    textarea { width:60%; min-height:60px; font-size:16px; padding:10px; resize:vertical; border-radius:8px; }
+    button { margin-top:20px; padding:10px 20px; background:#6f4e37; color:white; border:none; border-radius:8px; cursor:pointer; }
+    button:hover { background:#563625; }
+  </style>
 </head>
 <body>
-    <h2>Question {{ qnum }} of {{ total }}</h2>
-    <p>{{ question }}</p>
-    <form method="post">
-        <textarea name="answer" required></textarea><br>
-        {% if qnum > 1 %}
-            <a href="{{ url_for('questions', pair_code=pair_code, qnum=qnum-1) }}">
-                <button type="button">Back</button>
-            </a>
-        {% endif %}
-        <button type="submit">{% if qnum == total %}Submit{% else %}Next{% endif %}</button>
-    </form>
+  <h2>Questionnaire ({{ total }} total)</h2>
+  <form method="post" action="/submit">
+    {% for q in questions %}
+      <p><b>Question {{ loop.index }} of {{ total }}:</b> {{ q }}</p>
+      <textarea name="answer_{{ loop.index0 }}" required></textarea><br>
+    {% endfor %}
+    <button type="submit">Submit Answers</button>
+  </form>
 </body>
 </html>
-
-
